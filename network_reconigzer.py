@@ -25,8 +25,31 @@ def show_interfaces_table():
     print(tabulate(table, headers, tablefmt="rounded_grid"))
 
 
+def show_conections_table():
+    tcp = psutil.net_connections(kind='all')
+    print("Obteniendo conexiones de red...")
+    table = []
+    headers = ['Direccion Local', 'Puerto Local', 'Direccion Destino', 'Puerto Destino', 'ID Proceso', 'Estatus'  ]
+    for conection in tcp:
+        try:
+
+            laddr = conection.laddr.ip
+            lport = conection.laddr.port
+            raddr = conection.raddr.ip
+            rport = conection.raddr.port
+            pid = conection.pid
+            status = conection.status
+            table.append([ laddr, lport, raddr, rport, pid, status ])
+        except:
+            pass
+    print(tabulate(table, headers, tablefmt="rounded_grid"))
+        
+        
+        
+
 def main():
     show_interfaces_table()
+    show_conections_table()
     #print(psutil.net_io_counters(pernic=True, nowrap=True))
     #print(psutil.net_if_stats()) #Interfaces de Red
     #print(psutil.net_if_addrs())
