@@ -6,6 +6,7 @@ El reconocedor de red al ser ejecutador realiza un escaneo del las interfaces de
 ## Requerimientos
 - Python 3.9.+
 - psutil (pip install psutil)
+- pyserial (pip install pyserial)
 - tabulate (pip install tabulate)
 
 ## Modo de Uso
