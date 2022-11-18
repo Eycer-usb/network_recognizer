@@ -1,6 +1,22 @@
+import netifaces
 import psutil
 from tabulate import tabulate
 from serial.tools.list_ports import comports
+
+
+def get_nic_info(key, name, nic_info, nics_status, pack_info):
+    nic_entries = []
+    is_active = ('activa' if nics_status else 'inactiva')
+    for nent in nic_info:
+        try:
+            nic_entries.append([name, is_active, nent.address, nent.family.name, nent.netmask, 
+                pack_info[key].packets_sent, pack_info[key].packets_recv])
+        except AttributeError:
+            nic_entries.append([name, is_active, nent.address, 
+                nent.family.name, nent.netmask, None, None])
+
+    return nic_entries
+
 
 def show_interfaces_table():
     print("Obteniendo interfaces de red...")
@@ -8,19 +24,13 @@ def show_interfaces_table():
     interfaces =psutil.net_if_addrs()
     pack = psutil.net_io_counters(pernic=True, nowrap=True)
     table = []
-    table2 = []
     headers = [ 'Interfaz', 'Estatus', 'Direccion', 'Familia', 'Mascara de Red', 'Paquetes enviados', 'Paquetes recibidos' ]
     for key in interfaces_status:
-        interface = str(key)
-        family = interfaces[interface][0].family.name
-        address = interfaces[interface][0].address
-        mask = interfaces[interface][0].netmask
-        sent = pack[interface].packets_sent
-        recv = pack[interface].packets_recv
-        is_active = 'inactiva'
-        if (interfaces_status[key].isup):
-            is_active = 'activa'
-        table.append([interface, is_active, address, family, mask, sent, recv ])
+        nic_name = str(key)
+        is_active = interfaces_status[key].isup
+        info = get_nic_info(key, nic_name, interfaces[nic_name], is_active, pack)
+        for entry in info:
+            table.append(entry)
     
     print(tabulate(table, headers, tablefmt="rounded_grid"))
 
@@ -45,11 +55,18 @@ def show_conections_table():
     print(tabulate(table, headers, tablefmt="rounded_grid"))
         
         
-        
+def show_gateways():
+    gtws = netifaces.gateways()
+    default = gtws['default']
+    print()
+    for v in default.values():
+        print(f"Default Gateway: {v[0]}\n")
+
 
 def main():
     show_interfaces_table()
     show_conections_table()
+    show_gateways()
     #print(psutil.net_io_counters(pernic=True, nowrap=True))
     #print(psutil.net_if_stats()) #Interfaces de Red
     #print(psutil.net_if_addrs())
