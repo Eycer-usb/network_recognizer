@@ -1,4 +1,3 @@
-import netifaces
 import psutil
 from tabulate import tabulate
 from serial.tools.list_ports import comports
@@ -53,26 +52,12 @@ def show_conections_table():
         except:
             pass
     print(tabulate(table, headers, tablefmt="rounded_grid"))
-        
-        
-def show_gateways():
-    gtws = netifaces.gateways()
-    default = gtws['default']
-    print()
-    for v in default.values():
-        print(f"Default Gateway: {v[0]}\n")
+
 
 
 def main():
     show_interfaces_table()
     show_conections_table()
-    show_gateways()
-    #print(psutil.net_io_counters(pernic=True, nowrap=True))
-    #print(psutil.net_if_stats()) #Interfaces de Red
-    #print(psutil.net_if_addrs())
-    #print(psutil.net_connections(kind='inet'))
-    
-
 
 
 if __name__ == '__main__':
